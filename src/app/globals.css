@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.VIpgJd-ZVi9od-xl07Ob-lTBxed,
+.goog-te-gadget-simple {
+  display: flex !important;
+}
+.VIpgJd-ZVi9od-ORHb,
+.VIpgJd-ZVi9od-ORHb-OEVmcd {
+  display: none !important;
+}
+.translated-ltr body {
+  top: 0% !important;
+}

@@ -1,0 +1,16 @@
+{
+	"addresses": [
+		{
+			"name": "Charlotte",
+			"type": "Home",
+			"address": "18, 2nd Street. Madhavaram Colony\nMadhavaram\nChennai - 600 070\nTamil Nadu",
+			"mobileNumber": "1234567890"
+		},
+		{
+			"name": "Oliver",
+			"type": "Office",
+			"address": "15, School Street South\nVadapalani\nChennai - 600 002\nTamil Nadu",
+			"mobileNumber": "1234567890"
+		}
+	]
+}
