@@ -53,11 +53,11 @@ const AllPopularMerchants = ({ categoryId, categoryName }) => {
 
   return (
     <>
-      <div className="font-bold text-2xl ml-3 lg:ml-0 py-2">
+      <div className="font-bold text-2xl ml-3 lg:ml-12 py-2">
         Popular Shops Near You
       </div>
 
-      <h1 className="font-poppins underline decoration-[#ed8605] underline-offset-[5px] decoration-2 lg:text-[20px] text-[14px] font-fontMedium w-full ml-3 lg:ml-0">
+      <h1 className="font-poppins underline decoration-[#ed8605] underline-offset-[5px] decoration-2 lg:text-[20px] text-[14px] font-fontMedium w-full ml-3 lg:ml-12">
         POPULAR IN {categoryName ? categoryName.toUpperCase() : ""}
       </h1>
 

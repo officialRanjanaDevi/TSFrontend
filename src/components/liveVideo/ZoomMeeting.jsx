@@ -25,7 +25,7 @@ const ZoomMeeting = ({
     // Implement logic to join a Zoom meeting
     const meetConfig = {
       meetingNumber: meetZoomId,
-      userName: "state.user?.name",
+      userName: `${state.user?.name}`,
       passWord: meetZoomPass,
       leaveUrl: "/meeting",
       role: 0,
@@ -40,7 +40,7 @@ const ZoomMeeting = ({
         console.log(res.result);
       },
     });
-
+ 
     ZoomMtg.inMeetingServiceListener("onUserLeave", async function (data) {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_STRAPI_URL}/attendances`,
@@ -132,7 +132,7 @@ const ZoomMeeting = ({
         },
       });
   };
-
+console.log(state)
   return (
     <>
       <div className="fixed mb-5 w-full cursor-pointer hover:text-white text-[#999] bg-[#222] border-b border-[#080808] top-0 min-h-14">
@@ -140,9 +140,8 @@ const ZoomMeeting = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center mt-3 gap-2">
               <p>Title: {meetTitle} | </p>
-              <p>Name: {state.user?.name}</p>
+              <p>Name: {state.name}</p>
             </div>
-            <div>Mentor: Satyam Prakash</div>
           </div>
         </div>
       </div>

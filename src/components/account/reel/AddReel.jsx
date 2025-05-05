@@ -7,7 +7,8 @@ import { SlDislike } from "react-icons/sl";
 import { LiaCommentSolid } from "react-icons/lia";
 import { UserContext } from "@/lib/UserContext";
 import toast from "react-hot-toast";
-const AddReel = ({setOpen}) => {
+
+const AddReel = ({setOpen,fetchReels}) => {
   const [authenticated, setAuthenticated] = useContext(UserContext);
   const serverURL = process.env.NEXT_PUBLIC_BASE_API_URL;
   const [loading,setLoading]=useState(false);
@@ -48,6 +49,7 @@ const AddReel = ({setOpen}) => {
       setLoading(false);
         toast.success("Reel uploaded");
         setOpen(false)
+        fetchReels()
       }   
     } catch (e) {
        setLoading(false);
@@ -57,15 +59,16 @@ const AddReel = ({setOpen}) => {
     }
   };
   return (
-    <div className="w-[500px] mx-auto  p-4 rounded flex flex-col gap-4 items-center">
+    <div className="w-[400px] mx-auto  p-4 rounded flex flex-col gap-4 items-center ">
+    
       {preview ? (
-        <div className="relative w-full h-full text-center">
+        <div className="relative w-full h-full text-center ">
           <video
             src={preview}
             controls
             className="border-2 border-black w-fit mx-auto h-[60vh] rounded "
           />
-          <div className="flex flex-col absolute right-6 gap-6 text-2xl bottom-28">
+          <div className="flex flex-col absolute right-2 gap-6 text-2xl bottom-28">
             <CiHeart />
             <IoShareSocialOutline />
             <SlDislike />
@@ -98,12 +101,16 @@ const AddReel = ({setOpen}) => {
         placeholder="Enter caption"
       />
 
-      <button
-        onClick={postData}
-        className="w-40 bg-amber-500 px-6 py-2 hover:scale-105 duration-300 rounded text-white text-lg"
-      >
-       {loading?"Please wait...":"Upload Reel"} 
-      </button>
+<button
+          onClick={postData}
+          disabled={loading}
+          className={`bg-amber-500 text-white rounded text-sm py-2 px-5 mr-2 hover:bg-amber-500 ${
+            loading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+        >
+          {loading?"Please wait...":"Upload Reel"}
+        
+        </button>
     </div>
   );
 };

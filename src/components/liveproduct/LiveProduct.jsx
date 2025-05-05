@@ -23,6 +23,7 @@ import CommentBox from "./reel/CommentBox";
 // import Upload from './UploadPhoto';
 
 function LiveProduct({ liveProductData, share, setShare, src }) {
+  console.log(liveProductData)
   const [authenticated, setAuthenticated] = useContext(UserContext);
   const [like, setLike] = useState(false);
   const [likeCount, setLikeCount] = useState(liveProductData.likes.length);
@@ -38,6 +39,22 @@ function LiveProduct({ liveProductData, share, setShare, src }) {
   const [description, setDescription] = useState(false);
   const [data, setData] = useState(liveProductData);
    const [comment,setComment]=useState(false);
+   const [commentCount,setCommentCount]=useState(liveProductData.comments.length);
+   const alreadyLiked = liveProductData?.likes?.some(
+    (like) => like.userId === authenticated?.user?._id
+  );
+    useEffect(() => {
+         const isFollowing = liveProductData?.store[0]?.followers?.followers.some(
+        (follower) => follower === authenticated.user._id
+      );
+        setFollow(isFollowing);
+  
+    }, []);
+
+  const alreadyDisLiked = liveProductData?.dislikes?.some(
+    (dislike) => dislike.userId === authenticated?.user?._id
+  );
+  
   const serverurl = process.env.NEXT_PUBLIC_BASE_API_URL;
   useEffect(() => {
     const videoElement = videoRef.current;
@@ -169,27 +186,21 @@ function LiveProduct({ liveProductData, share, setShare, src }) {
     }
   };
 
-  useEffect(() => {
-    const isFollowing =
-      data.storeId.followers &&
-      data.storeId.followers.followers.includes(authenticated.user._id);
-    setFollow(isFollowing);
-  }, [authenticated.user._id]);
-  console.log(data)
+  console.log(follow)
   return (
     <>
       <div className="flex flex-row justify-center w-full ">
-        <div className="w-80 relative h-fit items-center bg-gray-200 flex my-12  ">
-          <div className=" w-80">
+        <div className="w-60 lg:w-80 relative h-fit items-center bg-gray-200 flex my-12  ">
+          <div className="w-60 lg:w-80">
             <video
               width={"320"}
               src={src}
               ref={videoRef}
-              className="w-80 rounded shadow-md shadow-black"
+              className="w-60 lg:w-80 rounded shadow-md shadow-black"
             />
-            <div className="absolute -right-20 flex flex-col  items-center justify-end gap-1 pb-2 mr-5  bottom-0  sm:left-80 sm:gap-3">
+                <div className="absolute   flex flex-col  items-center justify-end gap-1 pb-2   bottom-0 -right-12 sm:gap-3">
               <div className="flex flex-col gap-1 ">
-                {like ? (
+                {like|| alreadyLiked ? (
                   <div className=" flex items-center w-10 h-10 bg-white rounded-full sm:bg-gray-400">
                     <AiFillLike
                       className=" w-12 text-2xl text-blue-500"
@@ -216,7 +227,7 @@ function LiveProduct({ liveProductData, share, setShare, src }) {
                 </p>
               </div>
               <div className="flex flex-col gap-1 ">
-                {dislike ? (
+                {dislike||alreadyDisLiked ? (
                   <div className="flex items-center w-10 h-10 bg-white rounded-full sm:bg-gray-400">
                     {" "}
                     <AiFillDislike
@@ -254,7 +265,7 @@ function LiveProduct({ liveProductData, share, setShare, src }) {
                   <BiCommentDetail className="w-12 text-2xl" />
                 </div>
                 <p className="text-xs font-bold text-white sm:font-normal sm:inline sm:text-black ">
-                  {data.commentCount}
+                  {commentCount}
                 </p>
               </div>
               <div
@@ -269,41 +280,18 @@ function LiveProduct({ liveProductData, share, setShare, src }) {
                   <FaShare className="w-12 text-2xl" />
                 </div>
                 <p className="text-xs font-bold text-white sm:font-normal text-center sm:inline sm:text-black ">
-                  {shareCount}
+                  Share
                 </p>
               </div>
               {share && <Share share={share} setShare={setShare} url={src} />}
               <div
                 className="flex flex-col gap-1 cursor-pointer"
-                onClick={toggleOptions}
               >
                 <div className="flex items-center w-10 h-10 bg-white rounded-full sm:bg-gray-400 ">
                   <SlOptions className="w-12 text-2xl " />
                 </div>
               </div>
-              {showOptions && (
-                <div
-                  className={`w-60 rounded-md z-50 absolute bottom-14 left-[-182px] md:left-[-272px] bg-opacity-50 backdrop-blur-md p-4 border-2 border-orange-500  shadow `}
-                >
-                  <div
-                    className=" p-2 rounded-md cursor-pointer hover:white
-                                        "
-                    onClick={handleDescription}
-                  >
-                    {!description && (
-                      <h1 className="text-white font-bold">Description</h1>
-                    )}
-                    {description && (
-                      <h1 className=" text-white font-bold">
-                        Discover trendy fashion shorts from our store. Explore
-                        unique styles, find the perfect fit, and elevate your
-                        wardrobe effortlessly. Shop the latest looks and express
-                        your individuality with our curated collection.
-                      </h1>
-                    )}
-                  </div>
-                </div>
-              )}
+           
             </div>
           </div>
 
@@ -342,7 +330,7 @@ function LiveProduct({ liveProductData, share, setShare, src }) {
               />
             )}
           </div>
-          <Link href={`nearByStore/store?storeId=${data?.storeId?._id}`}>
+          <Link href={`nearByStore/store?storeId=${data?.store[0]?._id}`}>
             <button className="absolute w-[120px]  bottom-16 text-xs right-4 bg-[#EB8105] px-2 py-[0.4rem] hover:scale-105 duration-300">
               Shop now
             </button>
@@ -365,12 +353,11 @@ function LiveProduct({ liveProductData, share, setShare, src }) {
               <div className={follow2 ? "block" : "hidden "}>
                 <Spin className="inline h-3" />
               </div>
-              <div className={follow ? "hidden" : "block "}>
+              {follow?
+                <button className="inline w-full">Following</button>:
                 <button className="inline w-full">Follow store</button>
-              </div>
-              <div className={follow ? "block" : "hidden "}>
-                <button className="inline w-full">Following</button>
-              </div>
+
+              }
             </div>
           </div>
           <div className="flex absolute  left-2 bottom-10 items-center">
@@ -383,7 +370,7 @@ function LiveProduct({ liveProductData, share, setShare, src }) {
             />
             <div>
               <p className="w-32 ml-3  overflow-hidden text-xs text-white  bottom-12 left-8">
-                {data?.store?.storeName || "store name"}
+                {data?.store[0]?.storeName || "store name"}
               </p>
               <p className="w-32 ml-3  overflow-hidden text-xs text-white  bottom-12 left-8">
                 {data?.caption || "store name"}
@@ -392,7 +379,7 @@ function LiveProduct({ liveProductData, share, setShare, src }) {
           </div>
         </div>
           {comment && (
-                <CommentBox comment={comment} setComment={setComment} data={data.comments} reelID={data._id} reel={data} />
+                <CommentBox comment={comment} setComment={setComment} data={data.comments} reelID={data._id} reel={data} setCommentCount={setCommentCount}/>
               )}
       </div>
     </>

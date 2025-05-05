@@ -28,15 +28,15 @@ const StoreReview1 = ({ storeData, storeReviews }) => {
 
   useEffect(() => {
     if (authenticated.user._id && storeReviews.length > 0) {
-      const review=storeReviews.filter((review)=>{
-        if(review.userId._id===authenticated.user._id){
-          console.log(review.userId._id ,authenticated.user._id)
+      const review = storeReviews.filter((review) => {
+        if (review.userId._id === authenticated.user._id) {
+          console.log(review.userId._id, authenticated.user._id)
           return review
         }
       })
       // console.log(review[0],"hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
       if (review[0]) {
-        console.log(review[0],"hhhhhhhhhhhhhhhhh")
+        console.log(review[0], "hhhhhhhhhhhhhhhhh")
         setReviewed(true);
         setUserReview(review[0]);
         setRating(review[0].rating);
@@ -65,7 +65,7 @@ const StoreReview1 = ({ storeData, storeReviews }) => {
 
       setProgressData(progressData);
 
-    
+
     } else {
       // If user doesn't exist or there are no reviews
       let categorizedReview = {
@@ -102,9 +102,9 @@ const StoreReview1 = ({ storeData, storeReviews }) => {
   return (
     <div className="w-full">
       <section className="sm:w-full">
-      {bestReview ? (<>
-        <p className=" text-sm  font-fontBold">Recommended Product Reviews</p>
-        
+        {bestReview ? (<>
+          <p className=" text-sm  font-fontBold">Recommended Product Reviews</p>
+
           <section className="flex flex-col md:flex-row justify-between border-2 shadow-md my-2 p-4 items-center gap-2">
             <div className="flex flex-row justify-between md:justify-center   items-start md:items-center  gap-4">
               <img src={bestReview?.userId?.profilePic?.url || "/images/man.png"} alt="" className="bg-amber-600 h-16 w-16  md:h-20 md:w-20 rounded-full" />
@@ -132,20 +132,21 @@ const StoreReview1 = ({ storeData, storeReviews }) => {
 
         {userReview ? (
           <section className="border-2 shadow-md mt-6 flex flex-col sm:flex-row justify-center sm:h-auto mt-4  sm:justify-between sm:w-full sm:px-4 ">
-            <section className="flex sm:flex-row justify-center py-2">
-              <img
-           
-                src={userReview?.userId?.profilePic?.url||"/images/man.png" }
-                className="h-16 w-16  md:h-20 md:w-20py-2 sm:py-10"
-                alt=""
-              />
-              <section className="sm:justify-self-start items-center justify-center py-2 sm:py-10 mx-2 ">
-                <p className="font-fontMedium text-lg capitalize">
-                  {userReview?.userId?.name}
-                </p>
-                <p className="font-light text-sm">{userReview?.reviewText}</p>
-              </section>
-            </section>
+          <section className="flex sm:flex-row justify-center py-2 items-center">
+  <img
+    src={userReview?.userId?.profilePic?.url || "/images/man.png"}
+    className="h-16 w-16 md:h-20 md:w-20 border rounded-full object-cover"
+    alt="User profile"
+  />
+
+  <section className="flex flex-col justify-center py-2 sm:py-10 mx-2">
+    <p className="font-fontMedium text-lg capitalize">
+      {userReview?.userId?.name}
+    </p>
+    <p className="font-light text-sm">{userReview?.reviewText}</p>
+  </section>
+</section>
+
             {authenticated ? (
               <section className="pb-2 flex flex-col items-center justify-center ">
 

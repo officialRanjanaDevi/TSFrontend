@@ -110,7 +110,7 @@ function Liveproduct1({ data }) {
 
         try {
           const response = await axios.get(
-            `${process.env.NEXT_PUBLIC_BASE_API_URL}/api/v1/meetings/${authenticated.user._id}`
+            `${process.env.NEXT_PUBLIC_BASE_API_URL}/api/v1/meetings/${authenticated.user._id}/${data._id}`
           );
           setLiveMeetings(response.data.liveMeetings);
 

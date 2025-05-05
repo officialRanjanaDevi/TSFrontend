@@ -160,7 +160,6 @@ const ShoppingCart = () => {
       }
     } else if (couponType === "itsector" || couponType === "college") {
       try {
-        console.log(couponInputValue);
         const couponUrl = `${serverURL}/api/v1/verifyDomain/${couponType}`;
         const response = await axios.post(couponUrl, {
           email: couponInputValue,
@@ -647,6 +646,7 @@ const ShoppingCart = () => {
                       setCouponAppliedSuccess(false);
                       setCouponDiscount(0);
                       setCouponType("coupon");
+                      setCouponInputValue("");
                     }}
                     className={`${
                       couponType === "coupon" ? "underline text-amber-500" : ""
@@ -659,6 +659,7 @@ const ShoppingCart = () => {
                       setCouponAppliedSuccess(false);
                       setCouponDiscount(0);
                       setCouponType("college");
+                      setCouponInputValue("");
                     }}
                     className={`${
                       couponType === "college"
@@ -673,6 +674,7 @@ const ShoppingCart = () => {
                       setCouponAppliedSuccess(false);
                       setCouponDiscount(0);
                       setCouponType("itsector");
+                      setCouponInputValue("");
                     }}
                     className={`${
                       couponType === "itsector"
@@ -687,6 +689,7 @@ const ShoppingCart = () => {
                       setCouponAppliedSuccess(false);
                       setCouponDiscount(0);
                       setCouponType("school");
+                      setCouponInputValue("");
                     }}
                     className={`${
                       couponType === "school" ? "underline text-amber-500 " : ""

@@ -79,6 +79,9 @@ function ShopnowSide({store }) {
   };
  
   const likeHandler = () => {
+    if(dislike){
+      setDislike(false);
+    }
     setLike(!like);
 
     if (like) {
@@ -89,6 +92,9 @@ function ShopnowSide({store }) {
   };
 
   const dislikeHandler = () => {
+    if(like){
+      setLike(false)
+    }
     setDislike(!dislike);
 
     if (dislike) {

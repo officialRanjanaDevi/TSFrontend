@@ -1,115 +1,46 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useContext} from "react";
 import axios from "axios";
 import Image from "next/image";
 import EmptyStoreOffers from "./EmptyStoreOffers";
 import Link from "next/link";
-
+import { UserContext } from "@/lib/UserContext";
 const StoreOffers = ({ storeId }) => {
   const [offers, setOffers] = useState([]);
-  const [products, setProducts] = useState([]);
+  const [authenticated, setAuthenticated] = useContext(UserContext);
+  const userId = authenticated.user._id;
+
   const serverURL = process.env.NEXT_PUBLIC_BASE_API_URL;
-
   useEffect(() => {
-    const fetchOffers = async () => {
-      try {
-        const response = await axios.get(
-          `${serverURL}/api/v1/offer/getAllOffers`
-        );
-        setOffers(response.data);
-        console.log("Fetched Offers:", response.data);
-      } catch (error) {
-        console.error("Error fetching offers:", error);
+    axios
+      .get(`${serverURL}/api/v1/offer/getAllOffers/${storeId}`)
+      .then((response) => {
+        if (response.data) {
+          console.log(response)
+          setOffers(response.data)
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching notifications:", error);
+      });
+  }, [serverURL, userId]);
+  const formatDate = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        throw new Error("Invalid date string");
       }
-    };
 
-    fetchOffers();
-  }, [serverURL, storeId]);
-
-  // Define fetchProducts wrapped in useCallback
-  const fetchProducts = useCallback(
-    async (productIds) => {
-      try {
-        const uniqueProductIds = [...new Set(productIds)]; // Remove duplicates
-        const productsResponse = await Promise.all(
-          uniqueProductIds.map((productId) =>
-            axios.get(`${serverURL}/api/v1/products/${productId}`)
-          )
-        );
-        console.log("Unique Product IDs:", uniqueProductIds);
-
-        const fetchedProducts = productsResponse.map(
-          (response) => response.data
-        );
-
-        const filteredProducts = fetchedProducts.filter((product) => {
-          const productStoreId = product.storeId._id; // Adjust this based on your data structure
-          console.log("Product Store ID:", productStoreId);
-          console.log("Component Store ID:", storeId);
-          return productStoreId === storeId;
-        });
-
-        setProducts(filteredProducts);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    },
-    [serverURL, storeId]
-  );
-
-  useEffect(() => {
-    const productIds = offers.reduce(
-      (ids, offer) => [...ids, ...offer.applicableProducts],
-      []
-    );
-    if (productIds.length > 0) {
-      fetchProducts(productIds);
+      const distance = formatDistanceToNow(date, { addSuffix: true });
+      let formattedDistance = distance.replace(/^about\s/i, "");
+      formattedDistance += "\n";
+      return formattedDistance;
+    } catch (error) {
+      console.error("Error formatting date:", error.message);
+      return "Invalid date";
     }
-  }, [offers, serverURL, storeId, fetchProducts]);
-  // console.log(products,"here it is")
-  const Column = ({ title, description, validFrom, validUntil, discount, applicableProducts }) => (
-    <div className="py-1">
-      <div className="px-2">
-        {applicableProducts.map((productId, index) => {
-          const product = products.find((p) => p._id === productId);
+  };
 
-          return (
-            product && (
-              <Link href={`/products/details?productId=${productId}`}>
-                <div
-                  key={productId}
-                  className={`block relative flex rounded py-2 hover:border-blue-700 shadow-md border-[2px] overflow-hidden ${index > 0 ? "mt-4" : ""
-                    }`}
-                >
-                  <div className="flex flex-col w-full lg:bg-white lg:py-2 px-4">
-                    <p className="text-[18px] font-semibold">{title} upto {discount}% discount</p>
-                  
-                    <p className="text-[#7C7C7C] text-[10px] mt-2 lg:text-[16px] justify-start">
-                      {description}
-                    </p>
-                    <p className="text-[#7C7C7C] text-[15px] py-1">
-                     Offer period is from  <span className="text-neutral-700">{new Date(validFrom).toLocaleDateString()} </span>to <span className="text-neutral-700">{new Date(validUntil).toLocaleDateString()}</span>                   </p>
 
-                  </div>
-                  <div className="w-2/5 px-2 sm:w-1/5 lg:w-fit">
-                    <div className="relative block overflow-hidden rounded-lg">
-                      <img
-                        width={200}
-                        height={200}
-                        alt="ecommerce"
-                        className="mx-1 lg:h-[20vh] lg:w-[20vh] w-5/6 h-5/6 rounded-[2rem]"
-                        src={product?.productImage}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            )
-          );
-        })}
-      </div>
-    </div>
-  );
-  console.log(offers)
 
   return (
     <div className="w-full">
@@ -117,13 +48,50 @@ const StoreOffers = ({ storeId }) => {
         Offers
         {/* ({offers.length}) */}
       </div>
+
       <div>
-        {products.length > 0 ? (
-          offers.map((offer) => <Column key={offer._id} {...offer} />)
-        ) : (
-          <EmptyStoreOffers />
-        )}
+        {offers.length > 0 ? offers.map((offer) => (
+          <Link
+            href={`/products/details?productId=${offer?.applicableProducts[0]?._id}`}
+            key={offer?._id}
+          >
+
+            <div className="m-2 w-full overflow-hidden shadow-md border-[2px]" >
+              <div className="flex flex-row">
+                <div className="w-full flex flex-col justify-between bg-[#F1F1F180] lg:py-2 px-4 md:bg-white">
+                  <div>
+                    <h2 className="text-[14px] font-semibold pt-1">
+                      {offer?.title}
+                    </h2>
+                    <div className="flex flex-row">
+                      <span className="text-[#7C7C7C] text-[10px] lg:text-[14px] justify-start">
+                        {offer?.description}
+                      </span>
+                    </div>
+                    <div className="text-[#7C7C7C] text-[12px] py-1">
+                      upto {offer?.discount}% OFF
+                    </div></div>
+                  <div className="text-[#7C7C7C] text-[12px] py-1">
+                    expired {formatDate(offer?.validUntil)}
+                  </div>
+                </div>
+                <div className="py-2 px-4 overflow-hidden rounded-lg ">
+                  <img
+
+                    alt="Notification Image"
+                    className=" mx-1 md:h-[20vh] md:w-[18vw] h-[20vh] w-[50vw] rounded-md "
+                    src={offer?.applicableProducts[0]?.Images[0]?.url}
+                  />
+                </div>
+              </div>
+            </div>
+          </Link>
+        ))
+
+          : <EmptyStoreOffers />
+        }
       </div>
+
     </div>
   );
 };

@@ -2,11 +2,9 @@
 import Liveprodict from "./LiveProduct";
 import Searchbox2 from "./Searchbox2";
 import { useEffect, useRef, useState } from "react";
-import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 import LiveProductComment from "./LiveProductComment";
 import storage from "./firebase.config";
 import { ref, listAll, getDownloadURL } from "firebase/storage";
-import Loading from "@/components/common/Loading";
 import { io } from "socket.io-client";
 import { useRoom } from "@/lib/LiveStreamContext";
 import { useRouter } from "next/navigation";
@@ -16,7 +14,7 @@ import { BiCommentDetail } from "react-icons/bi";
 import { FaShare } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai";
-
+import Pagination from "../pagination/Pagination";
 function LiveproductPage() {
   const [reels, setReels] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +25,11 @@ function LiveproductPage() {
   const socket = useRef(null);
   const { setRoomID } = useRoom();
   const router = useRouter();
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(reels.length / 6);
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
   useEffect(() => {
     socket.current = io(process.env.NEXT_PUBLIC_BASE_API_URL_SELLER);
     
@@ -73,11 +75,12 @@ function LiveproductPage() {
         axios.get(`${process.env.NEXT_PUBLIC_BASE_API_URL_SELLER}/reels/getAllReels`),
         axios.get(`${process.env.NEXT_PUBLIC_BASE_API_URL}/reels/getAllReels`),
       ]);
-      console.log(customerResponse)
+      // console.log(customerResponse)
       const mergedReels = shuffleArray([
         ...(storeResponse.data.data || []),
         ...(customerResponse.data.data || []),
       ]);
+      mergedReels.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setReels(mergedReels);
     } catch (error) {
       console.error("Error fetching reels:", error);
@@ -132,7 +135,7 @@ function LiveproductPage() {
                   <div className="absolute -right-20  flex flex-col  items-center justify-end gap-1 pb-2 mr-5  bottom-0  sm:left-80 sm:gap-3">
                <div className="flex flex-col gap-1 ">
               
-                   <div className=" flex items-center w-10 h-10 bg-white rounded-full sm:bg-gray-400">
+                   <div className=" flex items-center w-10 h-10 bg-white rounded-full sm:bg-gray-400 cursor-pointer">
                      <AiOutlineLike
                        className="w-12 text-2xl "
                    
@@ -143,7 +146,7 @@ function LiveproductPage() {
                </div>
                <div className="flex flex-col gap-1 ">
              
-                   <div className="flex items-center w-10 h-10 bg-white rounded-full sm:bg-gray-400">
+                   <div className="flex items-center w-10 h-10 bg-white rounded-full sm:bg-gray-400 cursor-pointer">
                      {" "}
                      <AiOutlineDislike
                        className="w-12 text-2xl"
@@ -185,17 +188,29 @@ function LiveproductPage() {
            ))}
          </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center">
+        <>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 place-items-center">
           {reels.map((reel, index) => (
             <div key={index}>
               {reel.type === "store" ? (
                 <Liveprodict share={share} setShare={setShare} setComment={setComment} src={reel.video} liveProductData={reel} />
               ) : (
-                <ReelCard share={share} setShare={setShare} setComment={setComment} src={reel.video} liveProductData={reel} />
+                <ReelCard fetchReels={fetchReels} share={share} setShare={setShare} setComment={setComment} src={reel.video} liveProductData={reel} />
               )}
             </div>
           ))}
+
         </div>
+        {reels?.length > 0 ? (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          ) : (
+            <></>
+          )}
+        </>
       )}
     </div>
   );

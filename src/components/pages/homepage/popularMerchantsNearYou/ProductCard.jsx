@@ -32,22 +32,13 @@ const ProductCard = (props) => {
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
-    if (
-      productDetails &&
-      productDetails.followers &&
-      authenticated.name &&
-      authenticated.user._id
-    ) {
+
       const isFollowing = productDetails.followers.followers.some(
         (follower) => follower._id === authenticated.user._id
       );
       setFollow(isFollowing);
-    } else {
-      console.log(
-        "Either productDetails.followers or user._id is not available"
-      );
-    }
-  }, [productDetails, authenticated.user, serverURL]);
+
+  }, []);
 
   if (!productDetails) {
     return null; // or render a loading state or placeholder
@@ -113,9 +104,10 @@ const ProductCard = (props) => {
       productDetails.followers.followers.includes(authenticated.user._id);
     setFollow(isFollowing);
   }, [authenticated.user._id]);
+
   return (
-    <div className="h-fit flex flex-col gap-2 items-center shadow-md rounded w-full border hover:shadow-lg">
-      {showPopup && ( // Render the popup if showPopup is true
+    <div className="h-fit flex flex-col gap-2 items-center shadow-md rounded w-fit mx-auto border hover:shadow-lg">
+      {showPopup && ( 
         <Popup
           message="User not logged in. Please log in to follow store."
           onClose={() => setShowPopup(false)} 
